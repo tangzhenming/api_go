@@ -1,9 +1,45 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
+
+// go build . && ./api_go
+// or
+// go run .
+
+// ======
+
+// function
+// go 中使用 func 声明函数时，函数内部不能再使用 func 嵌套声明函数，但是可以声明匿名函数（并赋值给变量）
+// 还可以使用立即执行函数
+func foo(a int, b int) int {
+	// func bar () {} // expected expressionsyntax
+	c := func() int {
+		return 3
+	}
+	d := func(d1 int) int {
+		return d1
+	}(4)
+	return a + b + c() + d
+}
+
+// go 中函数还可以返回多个值
+// 返回值可以提前定义变量名字，并在 return 时默认返回
+func bar(a int, b int) (sum int, product int) {
+	sum = a + b
+	product = a * b
+	return
+}
+
+// 可变参数函数
+func sum(numbers ...int) int {
+	fmt.Println("numbers", numbers)
+	total := 0
+	for i, v := range numbers {
+		fmt.Println(i, v) // 不想要 index 下标的话，可以使用 _ 代替 i
+		total += v
+	}
+	return total
+}
 
 func main() {
 	// // Hello World
@@ -75,37 +111,44 @@ func main() {
 
 	// ======
 
-	// if
-	if num := 9; num < 0 { // 局部作用域，改变量仅在当前的 if else 中生效
-		fmt.Println(num, "负数", num)
-	} else if num < 10 {
-		fmt.Println("一位数", num)
-	} else {
-		fmt.Println("多位数", num)
-	}
+	// // if
+	// if num := 9; num < 0 { // 局部作用域，改变量仅在当前的 if else 中生效
+	// 	fmt.Println(num, "负数", num)
+	// } else if num < 10 {
+	// 	fmt.Println("一位数", num)
+	// } else {
+	// 	fmt.Println("多位数", num)
+	// }
 
-	num := 9
-	if num < 0 {
-		fmt.Println(num, "负数", num)
-	} else if num < 10 {
-		fmt.Println("一位数", num)
-	} else {
-		fmt.Println("多位数", num)
-	}
+	// num := 9
+	// if num < 0 {
+	// 	fmt.Println(num, "负数", num)
+	// } else if num < 10 {
+	// 	fmt.Println("一位数", num)
+	// } else {
+	// 	fmt.Println("多位数", num)
+	// }
 
-	// switch
-	// switch 一个 case 可以跟多个值
-	// 默认无需使用 break
-	// 如果需要贯穿条件，可以加 fallthrough
-	switch time.Now().Weekday() {
-	case time.Monday, time.Tuesday, time.Wednesday, time.Thursday, time.Friday:
-		fmt.Println("It's weekday", time.Now().Weekday())
-		// fallthrough
-	default:
-		fmt.Println("It's weekend")
-	}
+	// // switch
+	// // switch 一个 case 可以跟多个值
+	// // 默认无需使用 break
+	// // 如果需要贯穿条件，可以加 fallthrough
+	// switch time.Now().Weekday() {
+	// case time.Monday, time.Tuesday, time.Wednesday, time.Thursday, time.Friday:
+	// 	fmt.Println("It's weekday", time.Now().Weekday())
+	// 	// fallthrough
+	// default:
+	// 	fmt.Println("It's weekend")
+	// }
+
+	// ======
+
+	// function
+	fmt.Println(foo(1, 2))
+
+	fmt.Println(bar(1, 2))
+	a, b := bar(3, 4)
+	fmt.Println(a, b)
+
+	fmt.Println(sum(1, 2, 3, 4, 5, 6))
 }
-
-// go build . && ./api_go
-// or
-// go run .
