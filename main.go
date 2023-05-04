@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // go build . && ./api_go
 // or
@@ -144,11 +146,77 @@ func main() {
 	// ======
 
 	// function
-	fmt.Println(foo(1, 2))
+	// fmt.Println(foo(1, 2))
 
-	fmt.Println(bar(1, 2))
-	a, b := bar(3, 4)
-	fmt.Println(a, b)
+	// fmt.Println(bar(1, 2))
+	// a, b := bar(3, 4)
+	// fmt.Println(a, b)
 
-	fmt.Println(sum(1, 2, 3, 4, 5, 6))
+	// fmt.Println(sum(1, 2, 3, 4, 5, 6))
+
+	// ======
+
+	// 数据类型
+
+	// 简单的值类型
+	// int uint float complex
+	// string
+	// var a string = "a"
+	// b := "b"
+	// c := 'c' // int32 使用单引号时，表示单个字符（是字符，不是字符串），本质是字符编码，比如 ascii
+	// fmt.Println(a, b, c)
+	// boolean 在 if 中只能接布尔值
+
+	// 复杂的值类型
+	// 结构体（struct）
+	// type User struct {
+	// 	name string
+	// 	age  int
+	// }
+	// user1 := User{name: "aaa", age: 18}
+	// user2 := User{"bbb", 18}
+	// fmt.Println(user1, user2, user1.name, user2.name)
+
+	// 结构体作为参数时，注意，它依然是值类型，不要用引用类型的思维去学习
+	// type Point struct{ x, y int }
+	// modify := func(p Point) {
+	// 	// 值类型传递时，直接复制过来，这里修改的 p 和传入的 p1 没有任何关系了
+	// 	p.x = 100
+	// }
+	// p1 := Point{1, 2}
+	// modify(p1)
+	// fmt.Println(p1)
+	// 在上面的基础上，如果要修改 p1 的值，那么需要将 p1 的地址传入 modify 函数中
+	// type Point struct{ x, y int }
+	// modify := func(p *Point) {
+	// 	// 值类型传递时，直接复制过来，这里修改的 p 和传入的 p1 没有任何关系了
+	// 	p.x = 100
+	// }
+	// p1 := Point{1, 2}
+	// modify(&p1) // 传入的是 p1 的地址，取址符号 &
+	// fmt.Println(p1)
+
+	// 结构体转为字符串时，支持 label
+	// type User struct {
+	// 	ID       string `json:"user_id"`
+	// 	UserName string `json:"user_name"`
+	// 	Email    string `json:"email"`
+	// }
+	// u := User{
+	// 	"1", "2", "3",
+	// }
+	// bytes, error := json.Marshal(u)
+	// if error != nil {
+	// 	panic(error)
+	// }
+	// fmt.Println(string(bytes))
+
+	// 数组（定长）
+	// 值类型，不是引用类型
+	// 长度固定
+	// len(v) 获取长度
+	// 不常用
+	a := [5]int{1, 2, 3, 4, 5}
+	a[0] = 100
+	fmt.Println(a)
 }
