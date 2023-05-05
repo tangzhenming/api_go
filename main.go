@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"reflect"
 )
 
 // go build . && ./api_go
@@ -52,6 +51,26 @@ func zeroValue(ival int) {
 }
 func zeroPointer(iptr *int) {
 	*iptr = 0
+}
+
+// ======
+// 接口 interface
+type Printable interface {
+	toString() string
+}
+
+// 函数
+func print(p Printable) {
+	fmt.Println(p.toString())
+}
+
+type User struct {
+	name string
+}
+
+// 方法
+func (u User) toString() string {
+	return u.name
 }
 
 // ======
@@ -253,37 +272,75 @@ func main() {
 	// // 指针本身也有地址，可以用 & 取指针的地址
 	// fmt.Println(&iPtr)
 
-	// 数组 array
-	a1 := [3]int{1, 1, 1}            // 固定长度
-	a2 := [...]int{1, 1, 1, 1, 1, 1} // 不固定长度
-	fmt.Println(a1, a2)
-	fmt.Println(reflect.TypeOf(a1).Kind(), reflect.TypeOf(a2).Kind())
+	// // 数组 array
+	// a1 := [3]int{1, 1, 1}            // 固定长度
+	// a2 := [...]int{1, 1, 1, 1, 1, 1} // 不固定长度
+	// fmt.Println(a1, a2)
+	// fmt.Println(reflect.TypeOf(a1).Kind(), reflect.TypeOf(a2).Kind())
 
-	// 切片 slice
-	s1 := []int{1, 1, 1}
-	s2 := make([]int, 3)
-	fmt.Println(s1, s2)
-	fmt.Println(reflect.TypeOf(s1).Kind(), reflect.TypeOf(s2).Kind())
+	// // 切片 slice
+	// s1 := []int{1, 1, 1}
+	// s2 := make([]int, 3)
+	// fmt.Println(s1, s2)
+	// fmt.Println(reflect.TypeOf(s1).Kind(), reflect.TypeOf(s2).Kind())
 
-	// 遍历
-	for i, v := range s1 {
-		fmt.Println(i, v)
-	}
+	// // 遍历
+	// for i, v := range s1 {
+	// 	fmt.Println(i, v)
+	// }
 
-	// 追加
-	s1 = append(s1, 2)
-	fmt.Println(s1)
-	// slice 的本质
-	// slice 内部的结构体维护着一个定长数组，一个 len 和一个 cap 容量
-	// 追加内容时，如果 cap 不够，就复制到更长的数组，并抛弃旧的数组（所以 append 的时候需要）重新赋值一下 s1 = append(s1, 2)
-	// 扩容时 slice 对应的结构体会被复用
-	// 扩容逻辑：超过两倍时直接设置为 length ；阈值 256 ，低于 256 时翻倍增长，大于 256 时 1.25 倍增长
+	// // 追加
+	// s1 = append(s1, 2)
+	// fmt.Println(s1)
+	// // slice 的本质
+	// // slice 内部的结构体维护着一个定长数组，一个 len 和一个 cap 容量
+	// // 追加内容时，如果 cap 不够，就复制到更长的数组，并抛弃旧的数组（所以 append 的时候需要）重新赋值一下 s1 = append(s1, 2)
+	// // 扩容时 slice 对应的结构体会被复用
+	// // 扩容逻辑：超过两倍时直接设置为 length ；阈值 256 ，低于 256 时翻倍增长，大于 256 时 1.25 倍增长
 
-	// 切取 slice 的 slice ？哈哈
-	a3 := [...]int{1, 2, 3, 4, 5, 6}
-	s3 := a3[0:2]
-	s4 := a3[:2] // 上一步的 0 可省略
-	s5 := a3[:]
-	// s4 := a3
-	fmt.Println(s3, s4, s5)
+	// // 切取 slice 的 slice ？哈哈
+	// a3 := [...]int{1, 2, 3, 4, 5, 6}
+	// s3 := a3[0:2]
+	// s4 := a3[:2] // 上一步的 0 可省略
+	// s5 := a3[:]
+	// // s4 := a3
+	// fmt.Println(s3, s4, s5)
+
+	// // 哈希表 map
+	// m1 := map[string]int{
+	// 	"a": 1,
+	// 	"b": 22,
+	// }
+	// m2 := make(map[string]int)
+	// m2["c"] = 3
+	// m2["d"] = 4
+	// m3 := make(map[string]int)
+	// var m4 map[string]int // 只声明
+	// fmt.Println(m1, m2, m3, m4)
+	// fmt.Println(len(m1))
+	// // 删除
+	// delete(m1, "a")
+	// fmt.Println(m1)
+	// // 查询是否存在
+	// value1, hasKey1 := m1["a"]
+	// value2, hasKey2 := m1["b"]
+	// fmt.Println(value1, hasKey1, value2, hasKey2)
+	// // 遍历 map
+	// for key, value := range m2 {
+	// 	fmt.Println(key, value)
+	// }
+
+	// // 通道 chan
+	// // [深入理解 go chan](https://juejin.cn/post/7175028144812851237)
+	// // go 里面，在实际程序运行的过程中，往往会有很多协程在执行，通过启动多个协程的方式，我们可以更高效地利用系统资源。而不同协程之间往往需要进行通信，不同于以往多线程程序的那种通信方式，在 go 里面是通过 channel （也就是 chan 类型）来进行通信的，实现的方式简单来说就是，一个协程往 channel 里面写数据，然后其他的协程可以从 channel 中将其读取出来。（注意：文中的 chan 表示是 go 语言里面的 chan 关键字，而 channel 只是我们描述它的时候用的一个术语）
+	// ch := make(chan string)
+	// go func() { // 创建一个新的 go routine （轻量级的线程），用于异步执行函数
+	// 	ch <- "123"
+	// }()
+	// msg := <-ch
+	// fmt.Println(msg)
+
+	// 接口 interfave
+	u := User{"name111"}
+	print(u)
 }
