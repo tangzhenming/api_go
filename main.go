@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 )
 
 // go build . && ./api_go
@@ -42,6 +43,18 @@ func sum(numbers ...int) int {
 	}
 	return total
 }
+
+// ======
+
+// 指针 Pointer
+func zeroValue(ival int) {
+	ival = 0
+}
+func zeroPointer(iptr *int) {
+	*iptr = 0
+}
+
+// ======
 
 func main() {
 	// // Hello World
@@ -156,7 +169,7 @@ func main() {
 
 	// ======
 
-	// 数据类型
+	// 数据类型 - 值类型
 
 	// 简单的值类型
 	// int uint float complex
@@ -216,7 +229,61 @@ func main() {
 	// 长度固定
 	// len(v) 获取长度
 	// 不常用
-	a := [5]int{1, 2, 3, 4, 5}
-	a[0] = 100
-	fmt.Println(a)
+	// a := [5]int{1, 2, 3, 4, 5}
+	// a[0] = 100
+	// fmt.Println(a)
+
+	// ======
+
+	// 数据类型 - 引用类型
+	// 该类型的变量不直接存放值，而是存放值的地址和其他信息
+
+	// 指针 Pointer
+	// i := 1
+	// iPtr := &i // &1 表示取 i 这个值的地址，在这里 iPtr 存了 i 的地址，它变成了一个 Pointer 指针
+	// fmt.Println("i", i)
+	// fmt.Println("iPtr", iPtr)
+
+	// zeroValue(i)
+	// fmt.Println(i, *iPtr) // iPtr 是指针，*iPtr 表示取指针的值，指针的值就是 i ，所以两者是等价的
+
+	// zeroPointer(iPtr)
+	// fmt.Println(i, *iPtr)
+
+	// // 指针本身也有地址，可以用 & 取指针的地址
+	// fmt.Println(&iPtr)
+
+	// 数组 array
+	a1 := [3]int{1, 1, 1}            // 固定长度
+	a2 := [...]int{1, 1, 1, 1, 1, 1} // 不固定长度
+	fmt.Println(a1, a2)
+	fmt.Println(reflect.TypeOf(a1).Kind(), reflect.TypeOf(a2).Kind())
+
+	// 切片 slice
+	s1 := []int{1, 1, 1}
+	s2 := make([]int, 3)
+	fmt.Println(s1, s2)
+	fmt.Println(reflect.TypeOf(s1).Kind(), reflect.TypeOf(s2).Kind())
+
+	// 遍历
+	for i, v := range s1 {
+		fmt.Println(i, v)
+	}
+
+	// 追加
+	s1 = append(s1, 2)
+	fmt.Println(s1)
+	// slice 的本质
+	// slice 内部的结构体维护着一个定长数组，一个 len 和一个 cap 容量
+	// 追加内容时，如果 cap 不够，就复制到更长的数组，并抛弃旧的数组（所以 append 的时候需要）重新赋值一下 s1 = append(s1, 2)
+	// 扩容时 slice 对应的结构体会被复用
+	// 扩容逻辑：超过两倍时直接设置为 length ；阈值 256 ，低于 256 时翻倍增长，大于 256 时 1.25 倍增长
+
+	// 切取 slice 的 slice ？哈哈
+	a3 := [...]int{1, 2, 3, 4, 5, 6}
+	s3 := a3[0:2]
+	s4 := a3[:2] // 上一步的 0 可省略
+	s5 := a3[:]
+	// s4 := a3
+	fmt.Println(s3, s4, s5)
 }
