@@ -7,3 +7,5 @@
 /internal/controller 存放控制器
 
 /internal/router 存放路由
+
+/internal/database 存放数据库相关文件
