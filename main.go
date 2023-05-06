@@ -8,6 +8,6 @@ import (
 func main() {
 	database.ConnectPostgreSQL()
 	database.CreateTables()
-	database.ClosePostgreSQL()
+	defer database.ClosePostgreSQL() // how to use defer: https://sl.bing.net/h5D0LAVudgW
 	router.RunServe()
 }

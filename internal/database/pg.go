@@ -40,7 +40,7 @@ func ClosePostgreSQL() {
 }
 
 func CreateTables() {
-	// 创建 users
+	// 创建 users ，可以使用 AI 生成 SQL 语句，remember aviod error and make it suitable for PG
 	_, err := DB.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
