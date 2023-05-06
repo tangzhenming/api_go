@@ -8,15 +8,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "db-for-api-go"
-	port     = 5432
-	user     = "api-go"
-	password = "123456"
-	dbname   = "api-go_dev"
-)
+func PGConnect() {
+	host := "api-go-pg"
+	port := 5432
+	user := "api-go"
+	password := "123456"
+	dbname := "api-go-dev"
 
-func ConnectPostgreSQL() {
 	// Set up the database connection
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -31,15 +29,15 @@ func ConnectPostgreSQL() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("=== Successfully connected to the database!!! ===")
+	fmt.Println("=== Successfully connected to the PG database!!! ===")
 }
 
-func ClosePostgreSQL() {
+func PGClose() {
 	DB.Close()
-	fmt.Println("=== Successfully closed the database!!! ===")
+	fmt.Println("=== Successfully closed the PG database!!! ===")
 }
 
-func CreateTables() {
+func PGCreateTables() {
 	// 创建 users ，可以使用 AI 生成 SQL 语句，remember aviod error and make it suitable for PG
 	_, err := DB.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
@@ -53,5 +51,5 @@ func CreateTables() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("=== Successfully created users!!! ===")
+	fmt.Println("=== Successfully created PG table: users!!! ===")
 }

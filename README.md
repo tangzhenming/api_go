@@ -16,9 +16,12 @@
 
 ## PostgreSQL
 
-- 本地新启一个 Docker 容器来运行数据库 `docker run -d --name db-for-api-go -e POSTGRES_USER=api-go -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=api-go_dev -e PGDATA=/var/lib/postgresql/data/pgdata -v api-go-data:/var/lib/postgresql/data --network=api-go postgres:14`
+- 本地新启一个 Docker 容器来运行数据库 `docker run -d --name api-go-pg -e POSTGRES_USER=api-go -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=api-go-pg-dev -e PGDATA=/var/lib/postgresql/data/pgdata -v api-go-pg-data:/var/lib/postgresql/data --network=api-go-network postgres:14`
+- `docker network create api-go-network`
+- `docker network connect api-go-network b63e`
+- `docker start api-go-pg`
 - 进入 PG container `docker exec -it <container name/id> bash`；或者使用 `ckolkman.vscode-postgres` 插件
-- 连接数据库 `psql -U api-go -d api-go_dev`
+- 连接数据库 `psql -U api-go -d api-go-dev`
 - `\l` 查看所有数据库
 - `\d` 查看数据库表 `\d <table name>` 查看单个数据库表详情
 - `\q` 退出 PG 交互程序
@@ -104,4 +107,18 @@
    7. Run the `docker network connect <network> <container>` command, replacing `<network>` with the name of the network you chose and `<container>` with the name or ID of the Visual Studio Code dev container.
 7. 接入同一个 network 成功，依然报错 “dial tcp 127.0.0.1:5432: connect: connection refused exit status 1” ，追问 AI ，其再次让我检查 host
    1. answer: When running a PostgreSQL server in a Docker container, you cannot use localhost or 127.0.0.1 as the hostname to connect to the server from another container. Instead, you need to use the name of the PostgreSQL container as the hostname.
-   2. 讲 go 代码中的 host 设置为 PostgreSQL container name 后，`go run .` 成功运行
+   2. 将 go 代码中的 host 设置为 PostgreSQL container name 后，`go run .` 成功运行
+
+## MySQL
+
+`docker run -d --name api-go-mysql -e MYSQL_DATABASE=api-go-mysql-dev -e MYSQL_USER=api-go -e MYSQL_PASSWORD=123456 -e MYSQL_ROOT_PASSWORD=123456 -v api-go-mysql-data:/var/lib/mysql --network=api-go-network mysql:8 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci`
+
+- `mysql -u api-go -p api-go-mysql-dev`
+- `show databases;`
+- `use api-go-mysql-dev;`
+- `show tables;`
+- `describe users;`
+
+[Container 启动后又退出](https://stackoverflow.com/questions/40761876/cannot-restart-the-mysql-docker-container-gives-errors-like-cant-open-the-mys)
+
+如果 container 运行异常，可使用 `docker logs <container name/id>` 来查看日志。
