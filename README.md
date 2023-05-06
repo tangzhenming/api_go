@@ -16,7 +16,13 @@
 
 ## PostgreSQL
 
-本地新启一个 Docker 容器来运行数据库 `docker run -d --name db-for-api-go -e POSTGRES_USER=api-go -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=api-go_dev -e PGDATA=/var/lib/postgresql/data/pgdata -v api-go-data:/var/lib/postgresql/data --network=api-go postgres:14`
+- 本地新启一个 Docker 容器来运行数据库 `docker run -d --name db-for-api-go -e POSTGRES_USER=api-go -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=api-go_dev -e PGDATA=/var/lib/postgresql/data/pgdata -v api-go-data:/var/lib/postgresql/data --network=api-go postgres:14`
+- 进入 PG container `docker exec -it <container name/id> bash`；或者使用 `ckolkman.vscode-postgres` 插件
+- 连接数据库 `psql -U api-go -d api-go_dev`
+- `\l` 查看所有数据库
+- `\d` 查看数据库表 `\d <table name>` 查看单个数据库表详情
+- `\q` 退出 PG 交互程序
+- `exit` 退出 PG container
 
 ### 我是如何利用 AI 解决连接 PostgreSQL 过程中产生的问题的
 
