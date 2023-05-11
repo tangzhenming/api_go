@@ -8,6 +8,8 @@
 
 `go mod init github.com/tang-projects/api_go`
 
+`go mod tidy`
+
 [golang 系列: go mod 使用](https://zhuanlan.zhihu.com/p/394103953)
 
 ## Gin
