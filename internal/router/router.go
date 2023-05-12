@@ -2,11 +2,13 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/tang-projects/api_go/internal/controller"
+	"gorm.io/gorm"
 )
 
-func RunServe() {
+func Run(DB *gorm.DB) {
 	r := gin.Default()
-	r.GET("/ping", controller.Ping)
-	r.Run() // listen and serve on 0.0.0.0:8080
+
+	setupUser(r, DB)
+
+	r.Run()
 }

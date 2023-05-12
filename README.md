@@ -2,6 +2,12 @@
 
 [Go Dev Doc](https://go.dev/doc/)
 
+[Writing a Fully Fledged REST API Using PostgreSQL, Gin, and Gorm](https://betterprogramming.pub/writing-a-fully-fledged-api-using-postgresql-gin-and-gorm-4d5ba73114da)
+
+[Build a REST API with Golang from scratch: PostgreSQL with Gorm and Gin Web Framework](https://dc1888.medium.com/build-a-rest-api-with-golang-from-scratch-postgresql-with-gorm-and-gin-web-framework-3d3f95ccf2e7)
+
+[Building a REST API with Golang using Gin and Gorm](https://blog.logrocket.com/rest-api-golang-gin-gorm/)
+
 ## go mod
 
 `go mod init <project name>`

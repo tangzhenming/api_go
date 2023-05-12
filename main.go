@@ -1,13 +1,17 @@
 package main
 
 import (
-	"github.com/tang-projects/api_go/internal/database"
+	"log"
+
+	"github.com/tang-projects/api_go/internal/db"
 	"github.com/tang-projects/api_go/internal/router"
 )
 
 func main() {
-	database.PGConnect()
-	database.PGCreateTables()
-	defer database.PGClose() // how to use defer: https://sl.bing.net/h5D0LAVudgW
-	router.RunServe()
+	DB, err := db.DBConnection()
+	if err != nil {
+		log.Fatal("Database connection error", err)
+	}
+
+	router.Run(DB)
 }
