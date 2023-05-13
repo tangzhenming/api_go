@@ -1,0 +1,1 @@
+swag fmt && swag init -g internal/router/router.go && go run .
