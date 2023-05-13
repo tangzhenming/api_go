@@ -22,7 +22,7 @@ func DBConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	DB.Migrator().DropTable(&models.User{})
+	// DB.Migrator().DropTable(&models.User{})
 	err = DB.AutoMigrate(&models.User{})
 	if err != nil {
 		return nil, err
