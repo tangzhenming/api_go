@@ -7,4 +7,5 @@ type User struct {
 	UserMail   string    `json:"userMail"`
 	UserName   string    `json:"userName"`
 	CreateTime time.Time `json:"createTime"`
+	UpdateTime time.Time `json:"updateTime"`
 }
