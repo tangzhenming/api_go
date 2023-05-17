@@ -13,13 +13,6 @@ type UserController struct {
 	DB *gorm.DB
 }
 
-// CreateUser godoc
-//	@Summary	Create a user
-//	@Accept		json
-//	@Produce	json
-//	@Success	200
-//	@Failure	500
-//	@Router		/api/v1/users [post]
 func (ctrl UserController) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -35,14 +28,6 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "created"})
 }
 
-// ReadUser godoc
-//	@Summary	Read a user
-//	@Accept		json
-//	@Produce	json
-//	@Success	200
-//	@Failure	500
-//	@Param		id	path	int	true	"UserID"
-//	@Router		/api/v1/users/{id} [get]
 func (ctrl UserController) ReadUser(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
@@ -55,14 +40,6 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// UpdateUser godoc
-//	@Summary	Update a user
-//	@Accept		json
-//	@Produce	json
-//	@Success	200
-//	@Failure	500
-//	@Param		id	path	int	true	"UserID"
-//	@Router		/api/v1/users/{id} [put]
 func (ctrl UserController) UpdateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -83,14 +60,6 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "updated"})
 }
 
-// UpdateUser godoc
-//	@Summary	Update a user
-//	@Accept		json
-//	@Produce	json
-//	@Success	200
-//	@Failure	500
-//	@Param		id	path	int	true	"UserID"
-//	@Router		/api/v1/users/{id} [delete]
 func (ctrl UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	result := ctrl.DB.Delete(&models.User{}, id)
