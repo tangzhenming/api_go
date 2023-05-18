@@ -3,15 +3,18 @@ package main
 import (
 	"log"
 
-	"github.com/tang-projects/api_go/internal/db"
-	"github.com/tang-projects/api_go/internal/router"
+	"github.com/tang-projects/api_go/cmd"
 )
 
 func main() {
-	DB, err := db.DBConnection()
-	if err != nil {
-		log.Fatal("Database connection error", err)
+	if err := cmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
 
-	router.Run(DB)
+	// DB, err := db.DBConnection()
+	// if err != nil {
+	// 	log.Fatal("Database connection error", err)
+	// }
+
+	// router.Run(DB)
 }

@@ -8,7 +8,9 @@
 
 [Building a REST API with Golang using Gin and Gorm](https://blog.logrocket.com/rest-api-golang-gin-gorm/)
 
-## go mod
+[李文周的博客](https://www.liwenzhou.com/posts/Go/golang-menu/)
+
+## Go mod
 
 `go mod init <project name>`
 
@@ -138,3 +140,9 @@
 ### [GORM](https://gorm.io/)
 
 ### [kyleconroy/sqlc]
+
+## 命令行参数解析
+
+[使用 os.Args 和 flag](https://www.liwenzhou.com/posts/Go/flag/)
+
+[使用 cobra](https://github.com/spf13/cobra)
