@@ -10,11 +10,4 @@ func main() {
 	if err := cmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
-
-	// DB, err := db.DBConnection()
-	// if err != nil {
-	// 	log.Fatal("Database connection error", err)
-	// }
-
-	// router.Run(DB)
 }

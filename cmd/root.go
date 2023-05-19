@@ -1,30 +1,22 @@
+// $ go run . --help
+
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/tang-projects/api_go/internal/db"
+	"gorm.io/gorm"
 )
 
-var name string
-
-var rootCmd = &cobra.Command{
-	Use:   "app",
-	Short: "My app",
-	Long:  `My app does great things.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Hello %s\n", name)
-	},
-}
+var modelName string
+var err error
+var DB *gorm.DB
+var rootCmd = &cobra.Command{Use: "app"}
 
 func init() {
-	rootCmd.Flags().StringVarP(&name, "name", "n", "World", "The name to say hello to")
+	DB = db.DBConnection()
 }
 
 func Execute() error {
 	return rootCmd.Execute()
 }
-
-// Usage
-// go run . --help
-// go run . --name Ryan
