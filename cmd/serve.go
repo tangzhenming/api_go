@@ -6,7 +6,7 @@ import (
 )
 
 var port string
-var runCmd = &cobra.Command{
+var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Run the router and server",
 	Long:  `Run the router with the specified database and port.`,
@@ -16,6 +16,5 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
-	runCmd.Flags().StringVarP(&port, "port", "p", "8080", "To specify the port you're going to run the router and server.")
-	rootCmd.AddCommand(runCmd)
+	serveCmd.Flags().StringVarP(&port, "port", "p", "8080", "To specify the port you're going to run the router and server.")
 }

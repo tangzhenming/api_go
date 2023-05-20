@@ -18,5 +18,10 @@ func init() {
 }
 
 func Execute() error {
+	rootCmd.AddCommand(serveCmd)
+
+	rootCmd.AddCommand(migrateCmd)
+	rootCmd.AddCommand(dropCmd)
+
 	return rootCmd.Execute()
 }

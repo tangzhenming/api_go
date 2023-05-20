@@ -30,5 +30,4 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	migrateCmd.Flags().StringVarP(&modelName, "migrate", "m", "", "The name of the model to migrate")
-	rootCmd.AddCommand(migrateCmd)
 }

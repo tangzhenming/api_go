@@ -30,5 +30,4 @@ var dropCmd = &cobra.Command{
 
 func init() {
 	dropCmd.Flags().StringVarP(&modelName, "drop", "d", "", "The name of the model to drop")
-	rootCmd.AddCommand(dropCmd)
 }
