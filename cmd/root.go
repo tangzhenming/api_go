@@ -3,6 +3,8 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 	"github.com/tang-projects/api_go/internal/db"
 	"gorm.io/gorm"
@@ -17,11 +19,13 @@ func init() {
 	DB = db.DBConnection()
 }
 
-func Execute() error {
+func Execute() {
 	rootCmd.AddCommand(serveCmd)
 
 	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(dropCmd)
 
-	return rootCmd.Execute()
+	if err = rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
