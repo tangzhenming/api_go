@@ -25,7 +25,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"status": "created"})
+	c.JSON(http.StatusCreated, gin.H{"data": user})
 }
 
 func (ctrl UserController) ReadUser(c *gin.Context) {
@@ -37,7 +37,7 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (ctrl UserController) UpdateUser(c *gin.Context) {
@@ -47,7 +47,7 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 	id := c.Param("id")
-	result := ctrl.DB.Model(&models.User{}).Where("user_id = ?", id).Updates(user)
+	result := ctrl.DB.Model(&models.User{}).Where("ID = ?", id).Updates(user)
 	if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})

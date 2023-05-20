@@ -1,11 +1,9 @@
 package models
 
-import "time"
+import "gorm.io/gorm"
 
 type User struct {
-	UserID     int       `gorm:"primary_key;autoIncrement" json:"userID"`
-	UserMail   string    `json:"userMail"`
-	UserName   string    `json:"userName"`
-	CreateTime time.Time `json:"createTime"`
-	UpdateTime time.Time `json:"updateTime"`
+	gorm.Model
+	Name  string
+	Email string
 }
