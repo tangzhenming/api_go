@@ -3,27 +3,26 @@
 package cmd
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/tang-projects/api_go/internal/db"
-	"gorm.io/gorm"
+	"github.com/tang-projects/api_go/internal/tutorial"
 )
 
 var modelName string
 var err error
-var DB *gorm.DB
+var DB *sql.DB
 var rootCmd = &cobra.Command{Use: "app"}
 
 func init() {
-	DB = db.DBConnection()
+	DB = tutorial.ConnectToDB()
 }
 
 func Execute() {
-	rootCmd.AddCommand(serveCmd)
-
-	rootCmd.AddCommand(migrateCmd)
-	rootCmd.AddCommand(dropCmd)
+	// rootCmd.AddCommand(serveCmd)
+	// rootCmd.AddCommand(migrateCmd)
+	// rootCmd.AddCommand(dropCmd)
 
 	if err = rootCmd.Execute(); err != nil {
 		log.Fatal(err)

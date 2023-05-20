@@ -1,4 +1,4 @@
-package db
+package tutorial
 
 import (
 	"database/sql"
@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 )
 
 func ConnectToDB() *sql.DB {

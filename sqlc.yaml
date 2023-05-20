@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/tutorial/config/query.sql"
+    schema: "internal/tutorial/config/schema.sql"
+    gen:
+      go:
+        package: "tutorial"
+        out: "internal/tutorial"
