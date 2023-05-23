@@ -3,14 +3,18 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/tang-projects/api_go/internal/models"
+	"github.com/tang-projects/api_go/internal/utils"
 	"gorm.io/gorm"
 )
 
 type UserController struct {
-	DB *gorm.DB
+	DB          *gorm.DB
+	RedisClient *redis.Client
 }
 
 func (ctrl UserController) CreateUser(c *gin.Context) {
@@ -19,12 +23,52 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
-	result := ctrl.DB.Create(&user)
-	if result.Error != nil {
-		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+
+	// 如果没有提供验证码，则生成并发送验证码，流程中止
+	if user.VerificationCode == "" {
+		randCode := utils.GenerateRandCode() // 生成随机验证码
+
+		err := utils.SendEmail(user.Email, randCode)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// 缓存验证码和电子邮件地址
+		ctrl.RedisClient.Set(user.Email, randCode, time.Minute*5) // 验证码有效期为 5 分钟
+
+		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent."})
 		return
 	}
+
+	// 提供了验证码
+	// 如果验证验证码失败，流程中止
+	storedCode, err := ctrl.RedisClient.Get(user.Email).Result()
+	if err != nil || user.VerificationCode != storedCode {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid verification code"})
+		return
+	}
+
+	// 验证通过，创建/更新用户帐户
+	result := ctrl.DB.Where("Email = ?", user.Email).First(&user)
+	if result.Error == gorm.ErrRecordNotFound {
+		// 如果帐户不存在，创建一个新帐户
+		result = ctrl.DB.Create(&user)
+		if result.Error != nil {
+			log.Println(result.Error)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
+	} else {
+		// 如果帐户已经存在，更新用户信息
+		result = ctrl.DB.Model(&models.User{}).Where("Email = ?", user.Email).Updates(user)
+		if result.Error != nil {
+			log.Println(result.Error)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+			return
+		}
+	}
+
 	c.JSON(http.StatusCreated, gin.H{"data": user})
 }
 

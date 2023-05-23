@@ -5,6 +5,7 @@ package cmd
 import (
 	"log"
 
+	"github.com/go-redis/redis"
 	"github.com/spf13/cobra"
 	"github.com/tang-projects/api_go/internal/db"
 	"gorm.io/gorm"
@@ -13,10 +14,12 @@ import (
 var modelName string
 var err error
 var DB *gorm.DB
+var RedisClient *redis.Client
 var rootCmd = &cobra.Command{Use: "app"}
 
 func init() {
 	DB = db.DBConnection()
+	RedisClient = db.NewRedis()
 }
 
 func Execute() {

@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 )
 
-func Run(DB *gorm.DB, port string) {
+func Run(RedisClient *redis.Client, DB *gorm.DB, port string) {
 	r := gin.Default()
 
-	setupUser(r, DB)
+	setupUser(r, DB, RedisClient)
 
 	r.Run(fmt.Sprintf(":%s", port))
 }

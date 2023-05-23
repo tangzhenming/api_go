@@ -11,7 +11,7 @@ var serveCmd = &cobra.Command{
 	Short: "Run the router and server",
 	Long:  `Run the router with the specified database and port.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		router.Run(DB, port)
+		router.Run(RedisClient, DB, port)
 	},
 }
 
