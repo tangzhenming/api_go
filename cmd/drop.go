@@ -1,4 +1,4 @@
-// $ go run main.go drop
+// $ go run main.go drop [modelName]
 
 package cmd
 
@@ -11,31 +11,26 @@ import (
 	"github.com/tang-projects/api_go/internal/models"
 )
 
-var dropCmd *cobra.Command
+var dropCmd = &cobra.Command{
+	Use:   "drop",
+	Short: "Drop  table",
+	Long:  `Drop  table from the database.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		runDropCmd(cmd, args)
+	},
+}
 
-func init() {
-	var (
-		err       error
-		modelName string
-	)
+func runDropCmd(cmd *cobra.Command, args []string) {
+	var err error
 
-	dropCmd = &cobra.Command{
-		Use:   "drop",
-		Short: "Drop  table",
-		Long:  `Drop  table from the database.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			switch modelName {
-			case "User":
-				err = db.PG.Migrator().DropTable(&models.User{})
-			default:
-				log.Fatalf("Unknown model: %s", modelName)
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("Successfully drop %s \n", modelName)
-		},
+	switch args[0] {
+	case "User":
+		err = db.PG.Migrator().DropTable(&models.User{})
+	default:
+		log.Fatalf("Unknown model: %s", args[0])
 	}
-
-	dropCmd.Flags().StringVarP(&modelName, "drop", "d", "", "The name of the model to drop")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Successfully drop table by model: %s \n", args[0])
 }

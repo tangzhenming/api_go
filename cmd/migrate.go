@@ -1,4 +1,4 @@
-// $ go run . migrate
+// $ go run . migrate [modelName]
 
 package cmd
 
@@ -11,31 +11,26 @@ import (
 	"github.com/tang-projects/api_go/internal/models"
 )
 
-var migrateCmd *cobra.Command
+var migrateCmd = &cobra.Command{
+	Use:   "migrate",
+	Short: "Migrate the database",
+	Long:  `Migrate the database by creating or updating tables.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		runMigrateCmd(cmd, args)
+	},
+}
 
-func init() {
-	var (
-		err       error
-		modelName string
-	)
+func runMigrateCmd(cmd *cobra.Command, args []string) {
+	var err error
 
-	migrateCmd = &cobra.Command{
-		Use:   "migrate",
-		Short: "Migrate the database",
-		Long:  `Migrate the database by creating or updating tables.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			switch modelName {
-			case "User":
-				err = db.PG.AutoMigrate(&models.User{})
-			default:
-				log.Fatalf("Unknown model: %s", modelName)
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("Successfully migrate %s \n", modelName)
-		},
+	switch args[0] {
+	case "User":
+		err = db.PG.AutoMigrate(&models.User{})
+	default:
+		log.Fatalf("Unknown model: %s", args[0])
 	}
-
-	migrateCmd.Flags().StringVarP(&modelName, "migrate", "m", "", "The name of the model to migrate")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Successfully migrate table by model: %s \n", args[0])
 }
