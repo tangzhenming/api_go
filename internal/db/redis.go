@@ -6,7 +6,9 @@ import (
 	"github.com/go-redis/redis"
 )
 
-func NewRedis() *redis.Client {
+var RedisClient *redis.Client
+
+func NewRedis() {
 	var client *redis.Client
 
 	// 创建一个 Redis 客户端
@@ -20,7 +22,7 @@ func NewRedis() *redis.Client {
 	pong, err := client.Ping().Result()
 	fmt.Println(pong, err)
 
-	return client
+	RedisClient = client
 
 	// // 设置一个键值对
 	// err = client.Set("mykey", "myvalue", 0).Err()

@@ -4,16 +4,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func DBConnection() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("File .env can't loaded", err)
-	}
+var PG *gorm.DB
+
+func ConnectPG() {
 	dsn := os.Getenv("DB_DSN")
 
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -21,5 +18,5 @@ func DBConnection() *gorm.DB {
 		log.Fatal("Database connection error", err)
 	}
 
-	return DB
+	PG = DB
 }

@@ -6,16 +6,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
+	"github.com/tang-projects/api_go/internal/db"
 	"github.com/tang-projects/api_go/internal/models"
 	"github.com/tang-projects/api_go/internal/utils"
 	"gorm.io/gorm"
 )
 
-type UserController struct {
-	DB          *gorm.DB
-	RedisClient *redis.Client
-}
+type UserController struct{}
 
 func (ctrl UserController) CreateUser(c *gin.Context) {
 	var user models.User
@@ -35,7 +32,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		}
 
 		// 缓存验证码和电子邮件地址
-		ctrl.RedisClient.Set(user.Email, randCode, time.Minute*5) // 验证码有效期为 5 分钟
+		db.RedisClient.Set(user.Email, randCode, time.Minute*5) // 验证码有效期为 5 分钟
 
 		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent."})
 		return
@@ -43,17 +40,17 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 
 	// 提供了验证码
 	// 如果验证验证码失败，流程中止
-	storedCode, err := ctrl.RedisClient.Get(user.Email).Result()
+	storedCode, err := db.RedisClient.Get(user.Email).Result()
 	if err != nil || user.VerificationCode != storedCode {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid verification code"})
 		return
 	}
 
 	// 验证通过，创建/更新用户帐户
-	result := ctrl.DB.Where("Email = ?", user.Email).First(&user)
+	result := db.PG.Where("Email = ?", user.Email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
 		// 如果帐户不存在，创建一个新帐户
-		result = ctrl.DB.Create(&user)
+		result = db.PG.Create(&user)
 		if result.Error != nil {
 			log.Println(result.Error)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -61,7 +58,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		}
 	} else {
 		// 如果帐户已经存在，更新用户信息
-		result = ctrl.DB.Model(&models.User{}).Where("Email = ?", user.Email).Updates(user)
+		result = db.PG.Model(&models.User{}).Where("Email = ?", user.Email).Updates(user)
 		if result.Error != nil {
 			log.Println(result.Error)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
@@ -75,7 +72,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 func (ctrl UserController) ReadUser(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
-	result := ctrl.DB.First(&user, id)
+	result := db.PG.First(&user, id)
 	if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user"})
@@ -91,7 +88,7 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 	id := c.Param("id")
-	result := ctrl.DB.Model(&models.User{}).Where("ID = ?", id).Updates(user)
+	result := db.PG.Model(&models.User{}).Where("ID = ?", id).Updates(user)
 	if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
@@ -106,7 +103,7 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 
 func (ctrl UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	result := ctrl.DB.Delete(&models.User{}, id)
+	result := db.PG.Delete(&models.User{}, id)
 	if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
