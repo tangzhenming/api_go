@@ -13,3 +13,12 @@ Learning by AI chatbot.
   - Use [crypto/rand](https://pkg.go.dev/crypto/rand) to generate a random verification code
   - Use [gomail](https://pkg.go.dev/gopkg.in/gomail.v2?utm_source=godoc#example-package) to send verification code to user
   - Use [Redis](https://redis.io/docs/getting-started/) to cache verification code: `docker run --name api-go-redis --network api-go-network -d redis`
+- **2023.05.25**
+  - 使用 JWT 验证用户身份的基本步骤
+    1. 在用户登录后，服务端生成一个 JWT 并发送给客户端
+    2. 客户端在之后的请求中都会带上这个 JWT ，服务端通过验证这个 JWT 来确认用户身份
+  - 更多功能实现与细节
+    1. 在需要验证用户身份的接口中，使用中间件来验证客户端传来的 token
+    2. 创建或登录用户账户时都会新建 token ，刷新 token 时效性
+    3. 提供注销登录接口，标记 token 为空
+    4. 注销登录接口只能由当前用户操作，所以需要在鉴权中间件时将 userID 存储到路由上下文中，在 LogoutUser 控制器中通过路由上下文获取 userID 后标记其对应的 token 为空
