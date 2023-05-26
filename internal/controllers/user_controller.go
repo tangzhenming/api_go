@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -128,6 +129,12 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 
 func (ctrl UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
+	userID, _ := c.Get("userID")
+	if id != fmt.Sprint(userID) {
+		c.JSON(http.StatusNotAcceptable, gin.H{"error": "Failed to delete other user"})
+		return
+	}
+
 	result := db.PG.Delete(&models.User{}, id)
 	if result.Error != nil {
 		log.Println(result.Error)
