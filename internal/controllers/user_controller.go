@@ -35,7 +35,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		}
 
 		// 缓存验证码和电子邮件地址
-		db.RedisClient.Set(user.Email, randCode, time.Minute*30) // 验证码（ Redis 缓存）有效期为 30 分钟
+		db.RedisClient.Set(user.Email, randCode, time.Minute*60*24) // 验证码（ Redis 缓存）有效期为 24 小时
 
 		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent."})
 		return
@@ -54,7 +54,9 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		code    int
 		message string
 	)
-	result := db.PG.Where("Email = ?", user.Email).First(&user)
+
+	// Find user with email
+	result := db.PG.Unscoped().Where("Email = ?", user.Email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
 		// 如果帐户不存在，创建一个新帐户
 		result = db.PG.Create(&user)
@@ -63,25 +65,31 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 			return
 		}
+
 		code = http.StatusCreated
 		message = "Created"
 	} else if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find user"})
 		return
-	} else {
-		// 登录账户
-		code = http.StatusOK
-		message = "Logined"
 	}
 
-	// 无论是创建账户成功，还是登录账户成功，都重新生成 Token 并更新数据库
+	// User found
+	code = http.StatusOK
+	message = "Logined"
+
+	// Reset token and deleted_at field
 	token, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate Token"})
 		return
 	}
-	db.PG.Model(&user).Update("Token", token)
+	result = db.PG.Unscoped().Model(&user).Updates(map[string]interface{}{"Token": token, "deleted_at": nil})
+	if result.Error != nil {
+		log.Println(result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reset token and deleted_at field in user"})
+		return
+	}
 
 	c.JSON(code, gin.H{"data": user, "message": message})
 }
@@ -90,7 +98,7 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 	var user models.User
 
 	id := c.Param("id")
-	result := db.PG.First(&user, id)
+	result := db.PG.Omit("Token").First(&user, id)
 	if result.Error != nil {
 		log.Println(result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user"})
@@ -107,12 +115,18 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 func (ctrl UserController) UpdateUser(c *gin.Context) {
 	var user models.User
 
+	id := c.Param("id")
+	userID, _ := c.Get("userID")
+	if id != fmt.Sprint(userID) {
+		c.JSON(http.StatusNotAcceptable, gin.H{"error": "Failed to update other user"})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id := c.Param("id")
 	result := db.PG.Model(&models.User{}).Where("ID = ?", id).Updates(user)
 	if result.Error != nil {
 		log.Println(result.Error)

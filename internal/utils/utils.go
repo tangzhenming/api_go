@@ -41,7 +41,7 @@ func SendEmail(email, randCode string) error {
 		"To":      {email},
 		"Subject": {"XXX验证码"},
 	})
-	m.SetBody("text/html", fmt.Sprintf(`您正在登录/注册 XXX <br/> 您的验证码是：%s <br /> 验证码有效期为 30 分钟`, randCode))
+	m.SetBody("text/html", fmt.Sprintf(`您正在登录/注册 XXX <br/> 您的验证码是：%s <br /> 验证码有效期为 24 小时`, randCode))
 
 	d, err := createDialer()
 	if err != nil {
