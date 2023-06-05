@@ -24,11 +24,10 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	// 如果没有提供验证码，则生成并发送验证码，流程中止
+	// 如果没有提供验证码，则通过邮件发送验证码，流程中止
 	if user.VerificationCode == "" {
-		randCode := utils.GenerateRandCode() // 生成随机验证码
 
-		err := utils.SendEmail(user.Email, randCode)
+		randCode, err := utils.SendEmail(user.Email)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
