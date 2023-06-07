@@ -11,6 +11,7 @@ func Run(port string) {
 	r := gin.Default()
 
 	setupUserRoutes(r)
+	setupPostRoutes(r)
 
 	r.Run(fmt.Sprintf(":%s", port))
 }

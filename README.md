@@ -22,3 +22,8 @@ Learning by AI chatbot.
     2. 创建或登录用户账户时都会新建 token ，刷新 token 时效性
     3. 提供注销登录接口，标记 token 为空
     4. 注销登录接口只能由当前用户操作，所以需要在鉴权中间件时将 userID 存储到路由上下文中，在 LogoutUser 控制器中通过路由上下文获取 userID 后标记其对应的 token 为空
+- **2023.06.07**
+  - 新增 Post 业务模块
+    1. 声明 Post 模型
+    2. 添加 migrate 和 drop 命令；执行命令使用 AutoMigrate 创建数据表
+    3. 确认数据表创建完成后，即可使用 Post 模型去操作数据库

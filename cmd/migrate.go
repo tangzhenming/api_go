@@ -26,6 +26,8 @@ func runMigrateCmd(cmd *cobra.Command, args []string) {
 	switch args[0] {
 	case "User":
 		err = db.PG.AutoMigrate(&models.User{})
+	case "Post":
+		err = db.PG.AutoMigrate(&models.Post{})
 	default:
 		log.Fatalf("Unknown model: %s", args[0])
 	}

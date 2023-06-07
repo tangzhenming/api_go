@@ -19,3 +19,15 @@ func setupUserRoutes(r *gin.Engine) {
 	addAuthUserRoute("DELETE", "/:id", ctrl.DeleteUser, true) // 谨慎提供给用户，一般来说不会开放给用户进行操作
 	addAuthUserRoute("POST", "/logout", ctrl.LogoutUser, true)
 }
+
+func setupPostRoutes(r *gin.Engine) {
+	ctrl := controllers.PostController{}
+
+	addAuthPostRoute := func(method string, path string, handler gin.HandlerFunc, auth bool) {
+		basePath := "api/v1/posts"
+		AddAuthRoute(r, method, basePath+path, handler, auth)
+	}
+	addAuthPostRoute("POST", "", ctrl.CreatePost, true)
+	addAuthPostRoute("GET", "/:id", ctrl.ReadPost, false)
+	addAuthPostRoute("DELETE", "/:id", ctrl.DeletePost, true)
+}
