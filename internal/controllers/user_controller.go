@@ -15,7 +15,7 @@ import (
 
 type UserController struct{}
 
-// 通过邮箱验证码创建或登录用户账户
+// CreateUser 方法用于创建或登录用户账户。它接收一个 JSON 格式的请求体，其中包含用户的电子邮件地址和验证码。如果请求体中没有提供验证码，那么它会通过邮件发送验证码给用户。如果请求体中提供了验证码，那么它会验证验证码是否正确，然后根据电子邮件地址创建或登录用户账户。
 func (ctrl UserController) CreateUser(c *gin.Context) {
 	var user models.User
 
@@ -93,6 +93,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 	c.JSON(code, gin.H{"data": user, "message": message})
 }
 
+// ReadUser 方法用于读取用户信息。它接收一个 URL 参数 id，表示要查询的用户ID。它会根据这个 ID 查询对应的用户信息，并返回查询结果。
 func (ctrl UserController) ReadUser(c *gin.Context) {
 	var user models.User
 
@@ -111,6 +112,7 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Readed", "data": user})
 }
 
+// UpdateUser 方法用于更新用户信息。它接收一个 URL 参数 id，表示要更新的用户ID。它还接收一个 JSON 格式的请求体，其中包含要更新的字段及其新值。它会根据这些数据更新对应的用户信息。
 func (ctrl UserController) UpdateUser(c *gin.Context) {
 	var user models.User
 
@@ -140,6 +142,7 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Updated"})
 }
 
+// DeleteUser 方法用于删除用户账户。它接收一个 URL 参数 id，表示要删除的用户ID。它会根据这个 ID 删除对应的用户账户。
 func (ctrl UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	userID, _ := c.Get("userID")
@@ -162,6 +165,7 @@ func (ctrl UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
 }
 
+// LogoutUser 方法用于注销当前登录的用户。它不需要任何参数，只需调用这个方法即可将当前登录的用户注销。
 func (ctrl UserController) LogoutUser(c *gin.Context) {
 	userID, _ := c.Get("userID")
 
