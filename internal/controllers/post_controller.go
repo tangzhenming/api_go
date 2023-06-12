@@ -88,10 +88,19 @@ func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 	var input struct {
 		StartTime string `form:"start_time"`
 		EndTime   string `form:"end_time"`
+		Page      int    `form:"page"`
+		PageSize  int    `form:"page_size"`
 	}
 	if err := c.ShouldBindQuery(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters", "details": err.Error()})
 		return
+	}
+
+	if input.Page <= 0 {
+		input.Page = 1
+	}
+	if input.PageSize <= 0 {
+		input.PageSize = 10
 	}
 
 	var posts []models.Post
@@ -101,7 +110,8 @@ func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 	if input.StartTime != "" && input.EndTime != "" {
 		query = query.Where("created_at BETWEEN ? AND ?", input.StartTime, input.EndTime)
 	}
-	result := query.Find(&posts)
+	// 使用 Gorm 的 Offset 和 Limit 方法来实现分页查询
+	result := query.Offset((input.Page - 1) * input.PageSize).Limit(input.PageSize).Find(&posts)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
