@@ -110,8 +110,15 @@ func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 	if input.StartTime != "" && input.EndTime != "" {
 		query = query.Where("created_at BETWEEN ? AND ?", input.StartTime, input.EndTime)
 	}
+
+	var total int64
+	result := query.Count(&total)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
 	// 使用 Gorm 的 Offset 和 Limit 方法来实现分页查询
-	result := query.Offset((input.Page - 1) * input.PageSize).Limit(input.PageSize).Find(&posts)
+	result = query.Offset((input.Page - 1) * input.PageSize).Limit(input.PageSize).Find(&posts)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -132,7 +139,7 @@ func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": responsePosts})
+	c.JSON(http.StatusOK, gin.H{"data": responsePosts, "total": total})
 }
 
 func (ctrl PostController) DeletePost(c *gin.Context) {
