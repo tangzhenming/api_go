@@ -28,6 +28,7 @@ func setupPostRoutes(r *gin.Engine) {
 		AddAuthRoute(r, method, basePath+path, handler, auth)
 	}
 	addAuthPostRoute("POST", "", ctrl.CreatePost, true)
+	addAuthPostRoute("GET", "", ctrl.ReadPostsByTimeRange, false)
 	addAuthPostRoute("GET", "/:id", ctrl.ReadPost, false)
 	addAuthPostRoute("DELETE", "/:id", ctrl.DeletePost, true)
 }

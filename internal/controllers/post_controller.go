@@ -75,6 +75,32 @@ func (ctrl PostController) ReadPost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": post})
 }
 
+func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
+	var input struct {
+		StartTime string `form:"start_time"`
+		EndTime   string `form:"end_time"`
+	}
+	if err := c.ShouldBindQuery(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters", "details": err.Error()})
+		return
+	}
+
+	var posts []models.Post
+	query := db.PG.Preload("User", func(db *gorm.DB) *gorm.DB { // 使用 Gorm 的 Preload 方法来自动加载关联的用户对象
+		return db.Select("id", "created_at", "updated_at", "name", "email") // 使用 Gorm 的 Select 方法来指定返回的字段，从而避免返回敏感信息
+	}).Model(&models.Post{})
+	if input.StartTime != "" && input.EndTime != "" {
+		query = query.Where("created_at BETWEEN ? AND ?", input.StartTime, input.EndTime)
+	}
+	result := query.Find(&posts)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": posts})
+}
+
 func (ctrl PostController) DeletePost(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
