@@ -27,3 +27,6 @@ Learning by AI chatbot.
     1. 声明 Post 模型
     2. 添加 migrate 和 drop 命令；执行命令使用 AutoMigrate 创建数据表
     3. 确认数据表创建完成后，即可使用 Post 模型去操作数据库
+- **2023.06.12**
+  - 为 Post 添加获取所有 post 的功能
+  - 添加分页功能，包含 page, pageSize and total
