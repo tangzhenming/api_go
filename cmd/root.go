@@ -21,7 +21,7 @@ func init() {
 
 	// 初始化数据库
 	db.ConnectPG()
-	db.NewRedis()
+	db.ConnectRedis()
 }
 
 func Execute() {

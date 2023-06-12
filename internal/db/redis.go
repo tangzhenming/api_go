@@ -8,7 +8,7 @@ import (
 
 var RedisClient *redis.Client
 
-func NewRedis() {
+func ConnectRedis() {
 	var client *redis.Client
 
 	// 创建一个 Redis 客户端
