@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tang-projects/api_go/internal/db"
@@ -75,6 +76,14 @@ func (ctrl PostController) ReadPost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": post})
 }
 
+type ResponseUser struct {
+	ID        uint      `json:"ID"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
+	Name      string    `json:"Name"`
+	Email     string    `json:"Email"`
+}
+
 func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 	var input struct {
 		StartTime string `form:"start_time"`
@@ -98,7 +107,22 @@ func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": posts})
+	responsePosts := make([]struct {
+		models.Post
+		User ResponseUser `json:"User"`
+	}, len(posts))
+	for i, post := range posts {
+		responsePosts[i].Post = post
+		responsePosts[i].User = ResponseUser{
+			ID:        post.User.ID,
+			CreatedAt: post.User.CreatedAt,
+			UpdatedAt: post.User.UpdatedAt,
+			Name:      post.User.Name,
+			Email:     post.User.Email,
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": responsePosts})
 }
 
 func (ctrl PostController) DeletePost(c *gin.Context) {
