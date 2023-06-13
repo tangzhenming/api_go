@@ -75,7 +75,7 @@ func (ctrl PostController) ReadPost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": post})
 }
 
-func (ctrl PostController) ReadPostsByTimeRange(c *gin.Context) {
+func (ctrl PostController) ReadPosts(c *gin.Context) {
 	var input struct {
 		StartTime string `form:"start_time"`
 		EndTime   string `form:"end_time"`
