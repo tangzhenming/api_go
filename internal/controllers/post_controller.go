@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tang-projects/api_go/internal/db"
 	"github.com/tang-projects/api_go/internal/models"
+	"github.com/tang-projects/api_go/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,7 @@ func (ctrl PostController) CreatePost(c *gin.Context) {
 		UserID  uint   `json:"user_id" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body", "details": err.Error()})
+		utils.RespondJSON(c, 0, nil, err.Error())
 		return
 	}
 
@@ -27,10 +27,10 @@ func (ctrl PostController) CreatePost(c *gin.Context) {
 	var user models.User
 	result := db.PG.First(&user, input.UserID)
 	if result.Error == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+		utils.RespondJSON(c, 0, nil, "User not found")
 		return
 	} else if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 
@@ -41,38 +41,38 @@ func (ctrl PostController) CreatePost(c *gin.Context) {
 	}
 	result = db.PG.Create(&post)
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 
 	// 查询关联的用户对象并将其存储到 post.User 字段中
 	err := db.PG.Model(&post).Association("User").Find(&post.User)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.RespondJSON(c, 0, nil, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": post})
+	utils.RespondJSON(c, 1, post, "")
 }
 
 func (ctrl PostController) ReadPost(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		utils.RespondJSON(c, 0, nil, "Invalid post ID")
 		return
 	}
 
 	var post models.Post
 	result := db.PG.Preload("User").First(&post, id)
 	if result.Error == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		utils.RespondJSON(c, 0, nil, "Post not found")
 		return
 	} else if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": post})
+	utils.RespondJSON(c, 1, post, "")
 }
 
 func (ctrl PostController) ReadPosts(c *gin.Context) {
@@ -83,7 +83,7 @@ func (ctrl PostController) ReadPosts(c *gin.Context) {
 		PageSize  int    `form:"page_size"`
 	}
 	if err := c.ShouldBindQuery(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters", "details": err.Error()})
+		utils.RespondJSON(c, 0, nil, err.Error())
 		return
 	}
 
@@ -105,13 +105,13 @@ func (ctrl PostController) ReadPosts(c *gin.Context) {
 	var total int64
 	result := query.Count(&total)
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 	// 使用 Gorm 的 Offset 和 Limit 方法来实现分页查询
 	result = query.Offset((input.Page - 1) * input.PageSize).Limit(input.PageSize).Find(&posts)
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 
@@ -130,24 +130,28 @@ func (ctrl PostController) ReadPosts(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": responsePosts, "total": total})
+	data := map[string]interface{}{
+		"data":  responsePosts,
+		"total": total,
+	}
+	utils.RespondJSON(c, 1, data, "")
 }
 
 func (ctrl PostController) DeletePost(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		utils.RespondJSON(c, 0, nil, "Invalid post ID")
 		return
 	}
 
 	result := db.PG.Delete(&models.Post{}, id)
 	if result.Error == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		utils.RespondJSON(c, 0, nil, "Post not found")
 		return
 	} else if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		utils.RespondJSON(c, 0, nil, result.Error.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+	utils.RespondJSON(c, 1, nil, "deleted")
 }

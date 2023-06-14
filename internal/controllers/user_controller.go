@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +19,7 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		utils.RespondJSON(c, 0, nil, "Invalid request body")
 		return
 	}
 
@@ -29,14 +28,14 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 
 		randCode, err := utils.SendEmail(user.Email)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			utils.RespondJSON(c, 0, nil, err.Error())
 			return
 		}
 
 		// 缓存验证码和电子邮件地址
 		db.RedisClient.Set(user.Email, randCode, time.Minute*60*24) // 验证码（ Redis 缓存）有效期为 24 小时
 
-		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent."})
+		utils.RespondJSON(c, 1, nil, "Verification code sent.")
 		return
 	}
 
@@ -44,13 +43,12 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 	// 如果验证验证码失败，流程中止
 	storedCode, err := db.RedisClient.Get(user.Email).Result()
 	if err != nil || user.VerificationCode != storedCode {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid verification code"})
+		utils.RespondJSON(c, 0, nil, "Invalid verification code")
 		return
 	}
 
 	// 验证通过，创建或登录用户帐户
 	var (
-		code    int
 		message string
 	)
 
@@ -61,36 +59,34 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		result = db.PG.Create(&user)
 		if result.Error != nil {
 			log.Println(result.Error)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			utils.RespondJSON(c, 0, nil, "Failed to create user")
 			return
 		}
 
-		code = http.StatusCreated
 		message = "Created"
 	} else if result.Error != nil {
 		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find user"})
+		utils.RespondJSON(c, 0, nil, "Failed to find user")
 		return
 	}
 
 	// User found
-	code = http.StatusOK
 	message = "Logined"
 
 	// Reset token and deleted_at field
 	token, err := utils.GenerateToken(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate Token"})
+		utils.RespondJSON(c, 0, nil, "Failed to generate Token")
 		return
 	}
 	result = db.PG.Unscoped().Model(&user).Updates(map[string]interface{}{"Token": token, "deleted_at": nil})
 	if result.Error != nil {
 		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reset token and deleted_at field in user"})
+		utils.RespondJSON(c, 0, nil, "Failed to reset token and deleted_at field in user")
 		return
 	}
 
-	c.JSON(code, gin.H{"data": user, "message": message})
+	utils.RespondJSON(c, 1, user, message)
 }
 
 // ReadUser 方法用于读取用户信息。它接收一个 URL 参数 id，表示要查询的用户ID。它会根据这个 ID 查询对应的用户信息，并返回查询结果。
@@ -101,15 +97,15 @@ func (ctrl UserController) ReadUser(c *gin.Context) {
 	result := db.PG.Omit("Token").First(&user, id)
 	if result.Error != nil {
 		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user"})
+		utils.RespondJSON(c, 0, nil, "Failed to read user")
 		return
 	}
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found or no fields readed"})
+		utils.RespondJSON(c, 0, nil, "User not found or no fields readed")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Readed", "data": user})
+	utils.RespondJSON(c, 1, user, "Readed")
 }
 
 // UpdateUser 方法用于更新用户信息。它接收一个 URL 参数 id，表示要更新的用户ID。它还接收一个 JSON 格式的请求体，其中包含要更新的字段及其新值。它会根据这些数据更新对应的用户信息。
@@ -119,27 +115,27 @@ func (ctrl UserController) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	userID, _ := c.Get("userID")
 	if id != fmt.Sprint(userID) {
-		c.JSON(http.StatusNotAcceptable, gin.H{"error": "Failed to update other user"})
+		utils.RespondJSON(c, 0, nil, "Failed to update other user")
 		return
 	}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.RespondJSON(c, 0, nil, err.Error())
 		return
 	}
 
 	result := db.PG.Model(&models.User{}).Where("ID = ?", id).Updates(user)
 	if result.Error != nil {
 		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		utils.RespondJSON(c, 0, nil, "Failed to update user")
 		return
 	}
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found or no fields updated"})
+		utils.RespondJSON(c, 0, nil, "User not found or no fields updated")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Updated"})
+	utils.RespondJSON(c, 1, nil, "Updated")
 }
 
 // DeleteUser 方法用于删除用户账户。它接收一个 URL 参数 id，表示要删除的用户ID。它会根据这个 ID 删除对应的用户账户。
@@ -147,22 +143,22 @@ func (ctrl UserController) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	userID, _ := c.Get("userID")
 	if id != fmt.Sprint(userID) {
-		c.JSON(http.StatusNotAcceptable, gin.H{"error": "Failed to delete other user"})
+		utils.RespondJSON(c, 0, nil, "Failed to delete other user")
 		return
 	}
 
 	result := db.PG.Delete(&models.User{}, id)
 	if result.Error != nil {
 		log.Println(result.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		utils.RespondJSON(c, 0, nil, "Failed to delete user")
 		return
 	}
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		utils.RespondJSON(c, 0, nil, "User not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+	utils.RespondJSON(c, 1, nil, "deleted")
 }
 
 // LogoutUser 方法用于注销当前登录的用户。它不需要任何参数，只需调用这个方法即可将当前登录的用户注销。
@@ -172,5 +168,5 @@ func (ctrl UserController) LogoutUser(c *gin.Context) {
 	// 将 Token 标记为无效
 	db.PG.Model(&models.User{}).Where("id = ?", userID).Update("Token", "")
 
-	c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "msg": "Logout successfull"})
+	utils.RespondJSON(c, 1, nil, "Logout successfull")
 }
