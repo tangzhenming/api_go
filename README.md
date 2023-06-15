@@ -1,6 +1,6 @@
 # API-GO
 
-Learning by AI chatbot.
+## Logs
 
 - **2023.05.05**
   - Use [Gin](https://github.com/gin-gonic/gin) to handle routes
