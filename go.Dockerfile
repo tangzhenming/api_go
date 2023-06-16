@@ -5,7 +5,7 @@ FROM golang:1.18 as builder
 WORKDIR /app
 
 # 设置 Go 模块代理服务器
-ENV GOPROXY=https://goproxy.io
+ENV GOPROXY=https://goproxy.cn,direct
 
 # 将源代码复制到镜像中
 COPY . /app
