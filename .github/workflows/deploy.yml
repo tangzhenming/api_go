@@ -1,0 +1,16 @@
+name: production
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy_go:
+    runs-on: self-hosted
+    environment:
+      name: production
+      url: http://go.tangzhenming.com
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run docker compose
+        run: docker compose up --build -d

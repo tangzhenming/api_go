@@ -1,0 +1,12 @@
+version: "3"
+services:
+  go:
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+    container_name: go
+
+networks:
+  default:
+    external:
+      name: my_traefik_default
