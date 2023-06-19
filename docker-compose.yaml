@@ -12,4 +12,5 @@ services:
 
 networks:
   default:
-    name: my_traefik_default
+    external:
+      name: my_traefik_default
