@@ -7,7 +7,7 @@ services:
     env_file:
       - .env # 指定 env 文件
     labels:
-      - "traefik.http.routers.whoami.rule=Host(`api.tangzhenming.com`)"
+      - "traefik.http.routers.go.rule=Host(`api.tangzhenming.com`)"
     container_name: go
 
 networks:
