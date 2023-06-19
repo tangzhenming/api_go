@@ -27,4 +27,4 @@ COPY --from=builder /build/app /
 COPY --from=builder /build/.env /
 
 # 运行你的程序
-ENTRYPOINT ["/app"]
+ENTRYPOINT ["/app", "serve"]

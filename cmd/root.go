@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/tang-projects/api_go/internal/db"
+	"github.com/tang-projects/api_go/internal/models"
 )
 
 var rootCmd = &cobra.Command{Use: "api-go"}
@@ -22,6 +23,13 @@ func init() {
 	// 初始化数据库
 	db.ConnectPG()
 	db.ConnectRedis()
+
+	// 数据库同步
+	err = db.PG.AutoMigrate(&models.User{})
+	err = db.PG.AutoMigrate(&models.Post{})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Execute() {

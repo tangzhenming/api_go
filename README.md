@@ -30,3 +30,8 @@
 - **2023.06.12**
   - 为 Post 添加获取所有 post 的功能
   - 添加分页功能，包含 page, pageSize and total
+- **2023.06.19**
+  - 部署后端程序
+    - 1. `docker run -d --name api-go-pg -e POSTGRES_USER=api-go -e POSTGRES_PASSWORD=[POSTGRES_PASSWORD] -e POSTGRES_DB=api-go-dev -e PGDATA=/var/lib/postgresql/data/pgdata -v api-go-data:/var/lib/postgresql/data --network=my_traefik_default postgres:14`
+    - 2. `docker run --name api-go-redis --network my_traefik_default -d redis`
+    - 3. 数据库迁移

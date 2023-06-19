@@ -19,5 +19,5 @@ func init() {
 		},
 	}
 
-	serveCmd.Flags().StringVarP(&port, "port", "p", "8080", "To specify the port you're going to run the router and server.")
+	serveCmd.Flags().StringVarP(&port, "port", "p", "80", "To specify the port you're going to run the router and server.")
 }

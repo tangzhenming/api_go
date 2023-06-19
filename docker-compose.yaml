@@ -8,9 +8,10 @@ services:
       - .env # 指定 env 文件
     labels:
       - "traefik.http.routers.whoami.rule=Host(`api.tangzhenming.com`)"
+    ports:
+      - "80:80" # 把容器中的 80 端口映射到宿主机的 80 端口，否则无法从宿主机访问容器中的应用程序（容器中跑的 go 应用，路由监听的 80 端口 ）
     container_name: go
 
 networks:
   default:
-    external:
-      name: my_traefik_default
+    name: my_traefik_default
