@@ -6,6 +6,7 @@ services:
       dockerfile: go.Dockerfile
     labels:
       - "traefik.http.routers.go.rule=Host(`api.tangzhenming.com`)"
+      - "traefik.http.services.go.loadbalancer.server.port=80"
     container_name: go
 
 networks:
