@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/tls"
 	"fmt"
 	"os"
 	"strconv"
@@ -39,6 +40,9 @@ func SendEmail(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// 配置 TLS 连接
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	// Send the email
 	if err = d.DialAndSend(m); err != nil {
