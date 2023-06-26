@@ -3,12 +3,18 @@ package router
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tang-projects/api_go/internal/utils"
 )
 
 func Run(port string) {
 	r := gin.Default()
+
+	// 配置 CORS 策略
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://cra.tangzhenming.com"}
+	r.Use(cors.New(config))
 
 	setupUserRoutes(r)
 	setupPostRoutes(r)
