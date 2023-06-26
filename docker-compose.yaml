@@ -9,7 +9,7 @@ services:
       - "traefik.http.services.go.loadbalancer.server.port=80" # 告诉 Traefik，它应该将流量转发到我的 go 容器内部的 80 端口上
     container_name: go
     expose:
-      - "80" # 可以有多个容器都暴露相同的端口。每个容器都有自己的网络命名空间，因此它们可以独立地暴露相同的端口
+      - "80" # 可以有多个容器都暴露相同的端口。每个容器都有自己的网络命名空间，因此它们可以独立地暴露相同的端口；但要映射到主机上，只能是唯一的
 
 networks:
   default:
