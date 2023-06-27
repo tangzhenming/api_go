@@ -3,6 +3,7 @@
 package utils
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -54,6 +55,7 @@ func parseToken(token string) (*Claims, error) {
 func AuthMiddleware(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
+		c.Set("httpStatus", http.StatusUnauthorized)
 		RespondJSON(c, 0, nil, "请先登录")
 		c.Abort() // gin 框架中 Context 类型的一个方法，它用于终止当前请求的处理。当你在中间件或处理函数中调用 c.Abort() 时，后续的中间件和处理函数都不会被执行，请求的处理将立即结束
 		return
@@ -61,6 +63,7 @@ func AuthMiddleware(c *gin.Context) {
 
 	claims, err := parseToken(token)
 	if err != nil {
+		c.Set("httpStatus", http.StatusUnauthorized)
 		RespondJSON(c, 0, nil, "Token 无效")
 		c.Abort()
 		return
@@ -69,6 +72,7 @@ func AuthMiddleware(c *gin.Context) {
 	// 查询数据库，判断 Token 是否已经被标记为空（用户注销登录）
 	var user models.User
 	if result := db.PG.Where("id = ? AND token = ?", claims.UserID, token).First(&user); result.Error == gorm.ErrRecordNotFound {
+		c.Set("httpStatus", http.StatusUnauthorized)
 		RespondJSON(c, 0, nil, "Token 已失效")
 		c.Abort()
 		return

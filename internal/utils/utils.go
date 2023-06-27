@@ -38,5 +38,9 @@ func GenerateRandCode() string {
 
 // 替换 c.JSON 调用
 func RespondJSON(c *gin.Context, code int, data interface{}, message string) {
-	c.JSON(http.StatusOK, gin.H{"code": code, "data": data, "message": message})
+	httpStatus, exists := c.Get("httpStatus") // 从上下文中获取，一些特殊的接口比如需要鉴权的接口，在调用 RespondJSON 之前需要提前设置好 httpStatus
+	if !exists {
+		httpStatus = http.StatusOK
+	}
+	c.JSON(httpStatus.(int), gin.H{"code": code, "data": data, "message": message})
 }
