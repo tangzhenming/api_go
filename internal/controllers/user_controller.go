@@ -86,7 +86,15 @@ func (ctrl UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	utils.RespondJSON(c, 1, user, message)
+	// 自定义响应数据结构
+	responseUser := map[string]interface{}{
+		"ID":    user.ID,
+		"Name":  user.Name,
+		"Email": user.Email,
+		"Token": user.Token,
+	}
+
+	utils.RespondJSON(c, 1, responseUser, message)
 }
 
 // ReadUser 方法用于读取用户信息。它接收一个 URL 参数 id，表示要查询的用户ID。它会根据这个 ID 查询对应的用户信息，并返回查询结果。
