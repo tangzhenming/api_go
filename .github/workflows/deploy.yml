@@ -4,6 +4,9 @@ on:
   push:
     branches: ["main"]
 
+env:
+  COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
+
 jobs:
   deploy_go:
     runs-on: self-hosted
@@ -15,7 +18,7 @@ jobs:
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "text","text": {"content":"主人主人，我要开始部署 API_GO 啦 ☺️"}}'
+          -d '{"msgtype": "text","text": {"content":"主人主人，我要开始部署 API_GO 啦 ☺️\nDeployment by '$COMMIT_AUTHOR'"}}'
       - uses: actions/checkout@v3
       - name: Create env file
         run: |
@@ -32,4 +35,4 @@ jobs:
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "text","text": {"content":"主人主人，API_GO 部署成功！✌🏻"},"at":{"isAtAll": true}}'
+          -d '{"msgtype": "text","text": {"content":"主人主人，API_GO 部署成功！✌🏻\nDeployment by '$COMMIT_AUTHOR'"},"at":{"isAtAll": true}}'
