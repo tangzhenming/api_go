@@ -19,7 +19,7 @@ jobs:
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "text","text": {"content":"主人主人，我要开始部署 API_GO 啦 ☺️\n执行人：'$COMMIT_AUTHOR'\n流水线：'$WORKFLOW_URL'"}}'
+          -d '{"msgtype": "text","text": {"content":"主人主人，我要开始部署 API_GO 啦 ☺️\n流水线：'$WORKFLOW_URL'\n执行人：'$COMMIT_AUTHOR'"}}'
       - uses: actions/checkout@v3
       - name: Create env file
         run: |
@@ -33,7 +33,14 @@ jobs:
       - name: Run docker compose
         run: docker compose up --build -d
       - name: Notify the DingTalk group that the current project has been successfully deployed
+        if: success()
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "text","text": {"content":"主人主人，API_GO 部署成功！✌🏻\n执行人：'$COMMIT_AUTHOR'\n流水线：'$WORKFLOW_URL'"},"at":{"isAtAll": true}}'
+          -d '{"msgtype": "text","text": {"content":"主人主人，API_GO 部署成功！✌🏻\n流水线：'$WORKFLOW_URL'\n执行人：'$COMMIT_AUTHOR'"},"at":{"isAtAll": true}}'
+      - name: Notify the DingTalk group that the current project has failed to deploy
+        if: failure()
+        run: |
+          curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
+          -H 'Content-Type: application/json' \
+          -d '{"msgtype": "text","text": {"content":"主人主人，API_GO 部署失败！😭\n流水线：'$WORKFLOW_URL'\n执行人：'$COMMIT_AUTHOR'"},"at":{"isAtAll": true}}'
