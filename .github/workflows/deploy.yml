@@ -11,6 +11,11 @@ jobs:
       name: production
       url: http://go.tangzhenming.com
     steps:
+      - name: Notify the DingTalk group that the current project has been started deployment
+        run: |
+          curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
+          -H 'Content-Type: application/json' \
+          -d '{"msgtype": "text","text": {"content":"主人主人，我要开始部署啦 ☺️"}}'
       - uses: actions/checkout@v3
       - name: Create env file
         run: |
@@ -23,3 +28,8 @@ jobs:
           echo "CORS_ALLOW_ORIGINS=${{ secrets.CORS_ALLOW_ORIGINS }}" >> .env
       - name: Run docker compose
         run: docker compose up --build -d
+      - name: Notify the DingTalk group that the current project has been successfully deployed
+        run: |
+          curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
+          -H 'Content-Type: application/json' \
+          -d '{"msgtype": "text","text": {"content":"Deployment finished"}}'
