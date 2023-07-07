@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Remove spaces from COMMIT_MESSAGE
         run: |
-          COMMIT_MESSAGE_NO_SPACES="${COMMIT_MESSAGE// /}"
+          echo "COMMIT_MESSAGE_NO_SPACES=${COMMIT_MESSAGE// /}" >> $GITHUB_ENV
       - name: Notify the DingTalk group that the current project has been started deployment
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
