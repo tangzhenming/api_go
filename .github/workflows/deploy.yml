@@ -17,11 +17,14 @@ jobs:
       name: production
       url: http://go.tangzhenming.com
     steps:
+      - name: Remove spaces from COMMIT_MESSAGE
+        run: |
+          COMMIT_MESSAGE_NO_SPACES="${COMMIT_MESSAGE// /}"
       - name: Notify the DingTalk group that the current project has been started deployment
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"#### Flow 流水线消息通知\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ⏸开始执行\n\n > '$COMMIT_MESSAGE'"}}'
+          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"## <font color=\"#07c160\">Flow 流水线消息通知</font>\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ⏸开始执行\n\n提交内容: '$COMMIT_MESSAGE_NO_SPACES'"}}'
       - uses: actions/checkout@v3
       - name: Create env file
         run: |
@@ -39,10 +42,10 @@ jobs:
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"#### Flow 流水线消息通知\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ✅成功\n\n > '$COMMIT_MESSAGE'"},"at":{"isAtAll": true}}'
+          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"## <font color=\"#07c160\">Flow 流水线消息通知</font>\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ✅成功\n\n提交内容: '$COMMIT_MESSAGE_NO_SPACES'"}}'
       - name: Notify the DingTalk group that the current project has failed to deploy
         if: failure()
         run: |
           curl 'https://oapi.dingtalk.com/robot/send?access_token=${{ secrets.Ding_Bot_ACCESS_TOKEN }}' \
           -H 'Content-Type: application/json' \
-          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"#### Flow 流水线消息通知\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ❌失败\n\n > '$COMMIT_MESSAGE'"},"at":{"isAtAll": true}}'
+          -d '{"msgtype": "markdown","markdown": {"title":"Flow 流水线消息通知","text":"## <font color=\"#07c160\">Flow 流水线消息通知</font>\n\n流水线: ['$REPO_NAME'-流水线]('$WORKFLOW_URL')\n\n执行人: '$COMMIT_AUTHOR'\n\n运行状态: ❌失败\n\n提交内容: '$COMMIT_MESSAGE_NO_SPACES'"}}'
